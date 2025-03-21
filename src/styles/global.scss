@@ -1,0 +1,56 @@
+#jimeng-toolbox-root {
+  all: initial !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 2147483647 !important;
+
+  // 基础变量
+  --primary-color: #1890ff;
+  --bg-color: #ffffff;
+  --border-color: #e5e7eb;
+  --text-color: #1f2937;
+  --text-secondary: #6b7280;
+  --item-bg-color: #ffffff;
+  --item-hover-bg-color: #f3f4f6;
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  // 暗色主题支持
+  @media (prefers-color-scheme: dark) {
+    --primary-color: #4096ff;
+    --bg-color: #1f2937;
+    --border-color: #374151;
+    --text-color: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --item-bg-color: #2d3748;
+    --item-hover-bg-color: #374151;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+  }
+
+  * {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: var(--font-family) !important;
+  }
+
+  // 滚动条样式
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--text-secondary);
+    }
+  }
+}

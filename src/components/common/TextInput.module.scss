@@ -1,0 +1,88 @@
+.container {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 12px 12px 0 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #3b82f6;
+  padding: 0 4px;
+  min-width: 20px;
+  height: 18px;
+  margin-left: 4px;
+  transform: translateY(-1px);
+}
+
+.input {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 16px;
+  border: none;
+  background: #ffffff;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #2d3748;
+  resize: vertical;
+  margin-bottom: 5px;
+  display: block;
+  overflow-y: overlay;
+  scrollbar-gutter: stable;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+    background-clip: padding-box;
+
+    &:hover {
+      background: #9ca3af;
+    }
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}

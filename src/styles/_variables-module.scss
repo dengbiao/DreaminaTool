@@ -1,0 +1,142 @@
+// Colors
+$primary-color: #48bb78 !default;
+$primary-hover: #38a169 !default;
+$primary-light: #c6f6d5 !default;
+$primary-dark: #2f855a !default;
+
+$success-color: #48bb78 !default;
+$success-hover: #38a169 !default;
+$success-light: #c6f6d5 !default;
+
+$error-color: #f56565 !default;
+$error-hover: #e53e3e !default;
+$error-light: #fed7d7 !default;
+
+$info-color: #4299e1 !default;
+$info-hover: #3182ce !default;
+$info-light: #bee3f8 !default;
+
+$text-primary: #2d3748 !default;
+$text-secondary: #4a5568 !default;
+$text-tertiary: #718096 !default;
+
+$border-color: #e2e8f0 !default;
+$border-hover: #cbd5e0 !default;
+
+$background-primary: #ffffff !default;
+$background-secondary: #f7fafc !default;
+$background-tertiary: #edf2f7 !default;
+
+$toolbox-bg: rgba(255, 255, 255, 0.98) !default;
+$sidebar-bg: rgba(247, 250, 252, 0.8) !default;
+$hover-bg: rgba(0, 0, 0, 0.05) !default;
+
+$scrollbar-thumb: rgba(0, 0, 0, 0.1) !default;
+$scrollbar-thumb-hover: rgba(0, 0, 0, 0.2) !default;
+
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1) !default;
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1) !default;
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1) !default;
+
+// Typography
+$font-family: (
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Arial
+) !default;
+$font-size-xs: 12px !default;
+$font-size-sm: 14px !default;
+$font-size-md: 16px !default;
+$font-size-lg: 18px !default;
+$font-size-xl: 20px !default;
+
+// Spacing
+$spacing-xs: 4px !default;
+$spacing-sm: 8px !default;
+$spacing-md: 16px !default;
+$spacing-lg: 24px !default;
+$spacing-xl: 32px !default;
+
+// Border Radius
+$radius-sm: 4px !default;
+$radius-md: 6px !default;
+$radius-lg: 8px !default;
+$radius-xl: 12px !default;
+
+// Transitions
+$transition-fast: 0.2s !default;
+$transition-normal: 0.3s !default;
+$transition-slow: 0.5s !default;
+$transition-timing: cubic-bezier(0.4, 0, 0.2, 1) !default;
+
+:root {
+  // Colors
+  --primary-color: #{$primary-color};
+  --primary-hover: #{$primary-hover};
+  --primary-light: #{$primary-light};
+  --primary-dark: #{$primary-dark};
+
+  --success-color: #{$success-color};
+  --success-hover: #{$success-hover};
+  --success-light: #{$success-light};
+
+  --error-color: #{$error-color};
+  --error-hover: #{$error-hover};
+  --error-light: #{$error-light};
+
+  --info-color: #{$info-color};
+  --info-hover: #{$info-hover};
+  --info-light: #{$info-light};
+
+  --text-primary: #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --text-tertiary: #{$text-tertiary};
+
+  --border-color: #{$border-color};
+  --border-hover: #{$border-hover};
+
+  --background-primary: #{$background-primary};
+  --background-secondary: #{$background-secondary};
+  --background-tertiary: #{$background-tertiary};
+
+  --toolbox-bg: #{$toolbox-bg};
+  --sidebar-bg: #{$sidebar-bg};
+  --hover-bg: #{$hover-bg};
+
+  --scrollbar-thumb: #{$scrollbar-thumb};
+  --scrollbar-thumb-hover: #{$scrollbar-thumb-hover};
+
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+
+  // Typography
+  --font-family: #{$font-family};
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-md: #{$font-size-md};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+
+  // Spacing
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+
+  // Border Radius
+  --radius-sm: #{$radius-sm};
+  --radius-md: #{$radius-md};
+  --radius-lg: #{$radius-lg};
+  --radius-xl: #{$radius-xl};
+
+  // Transitions
+  --transition-fast: #{$transition-fast};
+  --transition-normal: #{$transition-normal};
+  --transition-slow: #{$transition-slow};
+  --transition-timing: #{$transition-timing};
+}

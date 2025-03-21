@@ -1,0 +1,85 @@
+@use "@styles/variables" as *;
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.content {
+  position: absolute;
+  z-index: 1000;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast) var(--transition-timing);
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.top {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-var(--spacing-xs));
+  }
+
+  &.bottom {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--spacing-xs));
+  }
+
+  &.left {
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-var(--spacing-xs));
+  }
+
+  &.right {
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(var(--spacing-xs));
+  }
+}
+
+.tooltipContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.text {
+  color: white;
+}
+
+.shortcut {
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: var(--font-size-xs);
+}
+
+.arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--text-primary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
