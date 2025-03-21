@@ -1,6 +1,17 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
+const dotenv = require("dotenv");
+
+// 加载环境变量
+const env = dotenv.config().parsed || {};
+
+// 将环境变量转换为 webpack 可以使用的格式
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
@@ -148,6 +159,7 @@ module.exports = {
     },
   },
   plugins: [
+    new webpack.DefinePlugin(envKeys),
     new MiniCssExtractPlugin({
       filename: "styles.css",
     }),
