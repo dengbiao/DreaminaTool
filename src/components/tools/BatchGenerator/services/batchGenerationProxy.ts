@@ -35,11 +35,14 @@ function createInjectedFunction(params: GenerationParams, prompts: string[]) {
       if (!imageManager) {
         throw new Error('无法获取 imageManager');
       }
+      debugger
 
       // 保存原始值
       const originalCanCustomSize = imageManager.canCustomSize;
       const originalSelectModelKey = imageManager.selectModelKey;
       const originalImageRatio = imageManager.imageRatio;
+      const originalSeed = imageManager.seed; // 
+      console.error('zhoupeng', originalSeed);// 保存原始seed值
 
       // 设置新值
       Object.defineProperties(imageManager, {
@@ -51,6 +54,9 @@ function createInjectedFunction(params: GenerationParams, prompts: string[]) {
         },
         imageRatio: {
           get: () => params.ratio
+        },
+        seed: {
+          get: () => params.seed
         }
       });
 
@@ -78,6 +84,10 @@ function createInjectedFunction(params: GenerationParams, prompts: string[]) {
         },
         imageRatio: {
           value: originalImageRatio,
+          writable: true
+        },
+        seed: {
+          value: originalSeed,
           writable: true
         }
       });

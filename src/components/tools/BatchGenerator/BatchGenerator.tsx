@@ -126,6 +126,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
     RATIO_CONFIGS[4]
   );
   const [sampleStrength, setSampleStrength] = useState(5);
+  const [seed, setSeed] = useState<number | undefined>(undefined);
   const [paramsCollapsed, setParamsCollapsed] = useState(() => {
     const savedCollapsed = localStorage.getItem(STORAGE_KEYS.PARAMS_COLLAPSED);
     return savedCollapsed !== null ? savedCollapsed === "true" : true;
@@ -289,6 +290,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 model: selectedModel,
                 ratio: selectedRatio,
                 strength: sampleStrength,
+                seed: seed,
               })
             }
             isGenerating={isGenerating}
@@ -307,6 +309,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 model: selectedModel,
                 ratio: selectedRatio,
                 strength: sampleStrength,
+                seed: seed,
               })
             }
             isGenerating={isGenerating}
@@ -325,6 +328,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 model: selectedModel,
                 ratio: selectedRatio,
                 strength: sampleStrength,
+                seed: seed,
               })
             }
             isGenerating={isGenerating}
@@ -338,6 +342,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
           onModelChange={setSelectedModel}
           onRatioChange={setSelectedRatio}
           onStrengthChange={setSampleStrength}
+          onSeedChange={setSeed}
           isCollapsed={paramsCollapsed}
           onCollapsedChange={setParamsCollapsed}
         />

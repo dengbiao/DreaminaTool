@@ -207,6 +207,7 @@ async function handleBatchGenerate(data: any, tabId?: number) {
                 if (prop === 'selectModelKey') return params.model.value;
                 if (prop === 'imageRatio') return params.ratio.type;
                 if (prop === 'prompt') return prompt;
+                if (prop === 'seed' && params.seed !== undefined) return params.seed;
                 if (prop === 'selectModel') {
                   return paramsManager.modelList.find((model: any) => model.modelReqKey === params.model.value);
                 }
@@ -219,6 +220,7 @@ async function handleBatchGenerate(data: any, tabId?: number) {
                     modelConfig: selectModel,
                     sampleStrength: params.strength,
                     model: selectModel.modelReqKey,
+                    seed: params.seed ?? target.seed,
                     largeImageInfo: {
                       width: params.ratio.width,
                       height: params.ratio.height,

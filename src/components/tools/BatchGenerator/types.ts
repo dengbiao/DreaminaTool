@@ -37,6 +37,7 @@ export interface GenerationParams {
   model: ModelConfig;
   ratio: RatioConfig;
   strength: number;
+  seed?: number;
 }
 
 // 状态信息接口
@@ -62,6 +63,7 @@ export const STORAGE_KEYS = {
   MODEL: "jimeng_model",
   RATIO: "jimeng_ratio",
   STRENGTH: "jimeng_strength",
+  SEED: "jimeng_seed",
   PARAMS_COLLAPSED: "jimeng_params_collapsed",
   PROMPT_HEIGHT: "jimeng_prompt_height",
   PROMPT_HEIGHT_MODE: "jimeng_prompt_height_mode",

@@ -17,6 +17,7 @@ interface ParamsPanelProps {
   onModelChange: (model: ModelConfig) => void;
   onRatioChange: (ratio: RatioConfig) => void;
   onStrengthChange: (strength: number) => void;
+  onSeedChange?: (seed: number | undefined) => void;
   isCollapsed: boolean;
   onCollapsedChange: (isCollapsed: boolean) => void;
 }
@@ -28,6 +29,7 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
   onModelChange,
   onRatioChange,
   onStrengthChange,
+  onSeedChange,
   isCollapsed,
   onCollapsedChange,
 }) => {
@@ -61,6 +63,15 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     return isNaN(parsedStrength) ? 5 : parsedStrength;
   });
 
+  const [seed, setSeed] = useState<number | undefined>(() => {
+    const savedSeed = localStorage.getItem(getStorageKey("SEED"));
+    if (savedSeed) {
+      const parsedSeed = parseInt(savedSeed, 10);
+      return isNaN(parsedSeed) ? undefined : parsedSeed;
+    }
+    return undefined;
+  });
+
   // 保存参数到本地存储
   useEffect(() => {
     localStorage.setItem(getStorageKey("MODEL"), selectedModel.value);
@@ -77,10 +88,38 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     onStrengthChange(strength);
   }, [strength, mode, onStrengthChange]);
 
+  // 保存seed到本地存储并通知父组件
+  useEffect(() => {
+    if (seed !== undefined) {
+      localStorage.setItem(getStorageKey("SEED"), seed.toString());
+    } else {
+      localStorage.removeItem(getStorageKey("SEED"));
+    }
+
+    if (onSeedChange) {
+      onSeedChange(seed);
+    }
+  }, [seed, mode, onSeedChange]);
+
   // 处理精细度变化
   const handleStrengthChange = (value: number) => {
     const validValue = isNaN(value) ? 10 : Math.max(1, Math.min(20, value));
     setStrength(validValue);
+  };
+
+  // 处理seed值变化
+  const handleSeedChange = (value: string) => {
+    if (value === "") {
+      setSeed(undefined);
+      return;
+    }
+
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue) && parsedValue >= 0 && parsedValue < 2147483647) {
+      setSeed(parsedValue);
+    } else {
+      setSeed(undefined);
+    }
   };
 
   return (
@@ -140,6 +179,19 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
             ratios={ratioConfigs}
             selectedRatio={selectedRatio}
             onRatioChange={setSelectedRatio}
+          />
+        </div>
+
+        <div className={styles.controlGroup}>
+          <label>Seed值</label>
+          <input
+            type="number"
+            min={0}
+            max={2147483646}
+            value={seed !== undefined ? seed : ""}
+            placeholder="可选，范围[0, 2147483646]"
+            onChange={(e) => handleSeedChange(e.target.value)}
+            className={styles.settingInput}
           />
         </div>
       </div>
