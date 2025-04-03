@@ -82,7 +82,7 @@ const MODEL_CONFIGS: ModelConfig[] = [
   },
 ];
 
-// 图片比例配置 (标清 1K)
+// 图片比例配置 (标清 1K - 非3.0模型)
 const RATIO_CONFIGS_1K: RatioConfig[] = [
   {
     ratio: "21:9",
@@ -99,8 +99,25 @@ const RATIO_CONFIGS_1K: RatioConfig[] = [
   { ratio: "9:16", width: 576, height: 1024, type: ImageRadioType.NineSixteen },
 ];
 
-// 图片比例配置 (高清 2K)
-const RATIO_CONFIGS_2K: RatioConfig[] = [
+// 图片比例配置 (标清 1K - 3.0模型)
+const RATIO_CONFIGS_MODEL3_1K: RatioConfig[] = [
+  {
+    ratio: "21:9",
+    width: 2016,
+    height: 864,
+    type: ImageRadioType.TwentyOneNine,
+  },
+  { ratio: "16:9", width: 1664, height: 936, type: ImageRadioType.SixteenNine },
+  { ratio: "3:2", width: 1584, height: 1056, type: ImageRadioType.ThreeTwo },
+  { ratio: "4:3", width: 1472, height: 1104, type: ImageRadioType.FourThree },
+  { ratio: "1:1", width: 1328, height: 1328, type: ImageRadioType.OneOne },
+  { ratio: "3:4", width: 1104, height: 1472, type: ImageRadioType.ThreeFour },
+  { ratio: "2:3", width: 1056, height: 1584, type: ImageRadioType.TwoThree },
+  { ratio: "9:16", width: 936, height: 1664, type: ImageRadioType.NineSixteen },
+];
+
+// 图片比例配置 (高清 2K - 仅3.0模型)
+const RATIO_CONFIGS_MODEL3_2K: RatioConfig[] = [
   {
     ratio: "21:9",
     width: 3024,
@@ -130,7 +147,6 @@ const RATIO_CONFIGS_2K: RatioConfig[] = [
 const STORAGE_KEYS = {
   MODEL: "jimeng_selected_model",
   RATIO: "jimeng_selected_ratio",
-  STRENGTH: "jimeng_sample_strength",
   PARAMS_COLLAPSED: "jimeng_params_collapsed",
   PROMPT_HEIGHT: "jimeng_prompt_height",
   GENERATION_MODE: "jimeng_generation_mode",
@@ -172,19 +188,22 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
   const currentClarity = is3Point0Model ? model3Clarity : "1k";
 
   // 根据当前模型和清晰度选择合适的比例配置
-  const ratioConfigs =
-    is3Point0Model && currentClarity === "2k"
-      ? RATIO_CONFIGS_2K
-      : RATIO_CONFIGS_1K;
+  const ratioConfigs = is3Point0Model
+    ? currentClarity === "2k"
+      ? RATIO_CONFIGS_MODEL3_2K // 图片3.0 + 2K模式
+      : RATIO_CONFIGS_MODEL3_1K // 图片3.0 + 1K模式
+    : RATIO_CONFIGS_1K; // 其他模型 (仅1K模式)
 
   // 选择的比例类型
   const [ratioType, setRatioType] = useState<number>(() => {
     const savedRatio = localStorage.getItem(STORAGE_KEYS.RATIO);
     if (savedRatio) {
       // 查找保存的比例，获取其类型
-      const savedConfig = [...RATIO_CONFIGS_1K, ...RATIO_CONFIGS_2K].find(
-        (r) => r.ratio === savedRatio
-      );
+      const savedConfig = [
+        ...RATIO_CONFIGS_1K,
+        ...RATIO_CONFIGS_MODEL3_2K,
+        ...RATIO_CONFIGS_MODEL3_1K,
+      ].find((r) => r.ratio === savedRatio);
       return savedConfig?.type || ImageRadioType.OneOne; // 默认为1:1
     }
     return ImageRadioType.OneOne; // 默认为1:1
