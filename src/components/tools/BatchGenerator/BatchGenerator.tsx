@@ -45,6 +45,11 @@ const GENERATION_TABS = [
 // 模型配置
 const MODEL_CONFIGS: ModelConfig[] = [
   {
+    value: "high_aes_general_v30l:general_v3.0_18b",
+    name: "图片 3.0",
+    description: "影视质感，文字更准，直出2k高清图",
+  },
+  {
     value: "high_aes_general_v21_L:general_v2.1_L",
     name: "图片 2.1",
     description: "稳定的结构和更强的影视质感，支持生成中、英文文字",
