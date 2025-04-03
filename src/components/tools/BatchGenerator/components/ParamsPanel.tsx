@@ -61,11 +61,7 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     return ratioConfigs[4];
   });
 
-  const [strength, setStrength] = useState(() => {
-    const savedStrength = localStorage.getItem(getStorageKey("STRENGTH"));
-    const parsedStrength = savedStrength ? parseInt(savedStrength, 10) : 5;
-    return isNaN(parsedStrength) ? 5 : parsedStrength;
-  });
+  const [strength, setStrength] = useState(5);
 
   const [seed, setSeed] = useState<number | undefined>(() => {
     const savedSeed = localStorage.getItem(getStorageKey("SEED"));
@@ -90,11 +86,6 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     onRatioChange(selectedRatio);
   }, [selectedRatio, mode, onRatioChange]);
 
-  useEffect(() => {
-    localStorage.setItem(getStorageKey("STRENGTH"), strength.toString());
-    onStrengthChange(strength);
-  }, [strength, mode, onStrengthChange]);
-
   // 保存seed到本地存储并通知父组件
   useEffect(() => {
     if (seed !== undefined) {
@@ -107,12 +98,6 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
       onSeedChange(seed);
     }
   }, [seed, mode, onSeedChange]);
-
-  // 处理精细度变化
-  const handleStrengthChange = (value: number) => {
-    const validValue = isNaN(value) ? 10 : Math.max(1, Math.min(20, value));
-    setStrength(validValue);
-  };
 
   // 处理seed值变化
   const handleSeedChange = (value: string) => {
@@ -167,8 +152,7 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
           </div>
         </div>
         <div className={styles.paramsSummary}>
-          {selectedModel.name.split(" - ")[0]} · 精细度 {strength} ·{" "}
-          {selectedRatio.ratio}
+          {selectedModel.name.split(" - ")[0]} · {selectedRatio.ratio}
           {showClaritySelector
             ? ` · ${clarity === "2k" ? "高清" : "标清"}`
             : ""}
@@ -183,11 +167,6 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
           />
-        </div>
-
-        <div className={styles.controlGroup}>
-          <label>精细度</label>
-          <StrengthSlider value={strength} onChange={handleStrengthChange} />
         </div>
 
         <div className={styles.controlGroup}>
