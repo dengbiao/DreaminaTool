@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import styles from "./BatchGenerator.module.scss";
 import {
   ImageRadioType,
@@ -76,8 +82,8 @@ const MODEL_CONFIGS: ModelConfig[] = [
   },
 ];
 
-// 图片比例配置
-const RATIO_CONFIGS: RatioConfig[] = [
+// 图片比例配置 (标清 1K)
+const RATIO_CONFIGS_1K: RatioConfig[] = [
   {
     ratio: "21:9",
     width: 1195,
@@ -91,6 +97,33 @@ const RATIO_CONFIGS: RatioConfig[] = [
   { ratio: "3:4", width: 768, height: 1024, type: ImageRadioType.ThreeFour },
   { ratio: "2:3", width: 682, height: 1024, type: ImageRadioType.TwoThree },
   { ratio: "9:16", width: 576, height: 1024, type: ImageRadioType.NineSixteen },
+];
+
+// 图片比例配置 (高清 2K)
+const RATIO_CONFIGS_2K: RatioConfig[] = [
+  {
+    ratio: "21:9",
+    width: 3024,
+    height: 1296,
+    type: ImageRadioType.TwentyOneNine,
+  },
+  {
+    ratio: "16:9",
+    width: 2560,
+    height: 1440,
+    type: ImageRadioType.SixteenNine,
+  },
+  { ratio: "3:2", width: 2496, height: 1664, type: ImageRadioType.ThreeTwo },
+  { ratio: "4:3", width: 2304, height: 1728, type: ImageRadioType.FourThree },
+  { ratio: "1:1", width: 2048, height: 2048, type: ImageRadioType.OneOne },
+  { ratio: "3:4", width: 1728, height: 2304, type: ImageRadioType.ThreeFour },
+  { ratio: "2:3", width: 1664, height: 2496, type: ImageRadioType.TwoThree },
+  {
+    ratio: "9:16",
+    width: 1440,
+    height: 2560,
+    type: ImageRadioType.NineSixteen,
+  },
 ];
 
 // 本地存储键名常量
@@ -127,9 +160,61 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
   const [selectedModel, setSelectedModel] = useState<ModelConfig>(
     MODEL_CONFIGS[0]
   );
-  const [selectedRatio, setSelectedRatio] = useState<RatioConfig>(
-    RATIO_CONFIGS[4]
-  );
+
+  // 记住图片3.0模型的清晰度选择
+  const [model3Clarity, setModel3Clarity] = useState<string>(() => {
+    const savedClarity = localStorage.getItem("model3_clarity");
+    return savedClarity || "1k";
+  });
+
+  // 当前使用的清晰度
+  const is3Point0Model = selectedModel.name.includes("图片 3.0");
+  const currentClarity = is3Point0Model ? model3Clarity : "1k";
+
+  // 根据当前模型和清晰度选择合适的比例配置
+  const ratioConfigs =
+    is3Point0Model && currentClarity === "2k"
+      ? RATIO_CONFIGS_2K
+      : RATIO_CONFIGS_1K;
+
+  // 选择的比例类型
+  const [ratioType, setRatioType] = useState<number>(() => {
+    const savedRatio = localStorage.getItem(STORAGE_KEYS.RATIO);
+    if (savedRatio) {
+      // 查找保存的比例，获取其类型
+      const savedConfig = [...RATIO_CONFIGS_1K, ...RATIO_CONFIGS_2K].find(
+        (r) => r.ratio === savedRatio
+      );
+      return savedConfig?.type || ImageRadioType.OneOne; // 默认为1:1
+    }
+    return ImageRadioType.OneOne; // 默认为1:1
+  });
+
+  // 根据当前的比例类型和ratio配置，确定当前要显示的ratio
+  const selectedRatio = useMemo(() => {
+    const ratio = ratioConfigs.find((r) => r.type === ratioType);
+    return ratio || ratioConfigs[4]; // 默认为1:1
+  }, [ratioConfigs, ratioType]);
+
+  // 当在ParamsPanel中改变比例选择时
+  const handleRatioChange = (ratio: RatioConfig) => {
+    setRatioType(ratio.type);
+    localStorage.setItem(STORAGE_KEYS.RATIO, ratio.ratio);
+  };
+
+  // 当改变清晰度选择时
+  const handleClarityChange = (clarity: string) => {
+    if (is3Point0Model) {
+      setModel3Clarity(clarity);
+      localStorage.setItem("model3_clarity", clarity);
+    }
+  };
+
+  // 当改变模型选择时
+  const handleModelChange = (model: ModelConfig) => {
+    setSelectedModel(model);
+  };
+
   const [sampleStrength, setSampleStrength] = useState(5);
   const [seed, setSeed] = useState<number | undefined>(undefined);
   const [paramsCollapsed, setParamsCollapsed] = useState(() => {
@@ -296,6 +381,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 ratio: selectedRatio,
                 strength: sampleStrength,
                 seed: seed,
+                clarity: currentClarity,
               })
             }
             isGenerating={isGenerating}
@@ -315,6 +401,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 ratio: selectedRatio,
                 strength: sampleStrength,
                 seed: seed,
+                clarity: currentClarity,
               })
             }
             isGenerating={isGenerating}
@@ -334,6 +421,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
                 ratio: selectedRatio,
                 strength: sampleStrength,
                 seed: seed,
+                clarity: currentClarity,
               })
             }
             isGenerating={isGenerating}
@@ -343,13 +431,15 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
         <ParamsPanel
           mode={mode}
           modelConfigs={MODEL_CONFIGS}
-          ratioConfigs={RATIO_CONFIGS}
-          onModelChange={setSelectedModel}
-          onRatioChange={setSelectedRatio}
+          ratioConfigs={ratioConfigs}
+          onModelChange={handleModelChange}
+          onRatioChange={handleRatioChange}
           onStrengthChange={setSampleStrength}
           onSeedChange={setSeed}
+          onClarityChange={handleClarityChange}
           isCollapsed={paramsCollapsed}
           onCollapsedChange={setParamsCollapsed}
+          clarity={currentClarity}
         />
 
         <button

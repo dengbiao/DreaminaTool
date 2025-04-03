@@ -122,6 +122,7 @@ async function handleBatchGenerate(data: any, tabId?: number) {
     target: { tabId },
     world: "MAIN",
     func: async (params: any, prompts: string[]) => {
+      // debugger;
       // 设置批量生成标记和终止标记
       window.__BATCH_GENERATING__ = true;
       window.__STOP_GENERATING__ = false;
@@ -224,6 +225,7 @@ async function handleBatchGenerate(data: any, tabId?: number) {
                     largeImageInfo: {
                       width: params.ratio.width,
                       height: params.ratio.height,
+                      resolutionType: params.clarity === "2k" ? "2k" : "1k",
                     },
                   };
                 }

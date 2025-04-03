@@ -1238,3 +1238,46 @@
     background: #1d4ed8;
   }
 }
+
+// 单选框组基础样式
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.radioInput {
+  margin-right: 8px;
+}
+
+.radioText {
+  font-weight: 500;
+}
+
+// 水平排列的单选框组样式
+.radioGroupHorizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.radioLabelHorizontal {
+  margin-right: 0;
+}
+
+// 清晰度选项特殊样式
+.clarityControlGroup {
+  label.radioLabel {
+    &::before {
+      display: none; // 移除蓝色竖线
+    }
+  }
+}

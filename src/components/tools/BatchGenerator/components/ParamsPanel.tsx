@@ -18,8 +18,10 @@ interface ParamsPanelProps {
   onRatioChange: (ratio: RatioConfig) => void;
   onStrengthChange: (strength: number) => void;
   onSeedChange?: (seed: number | undefined) => void;
+  onClarityChange?: (clarity: string) => void;
   isCollapsed: boolean;
   onCollapsedChange: (isCollapsed: boolean) => void;
+  clarity: string;
 }
 
 export const ParamsPanel: React.FC<ParamsPanelProps> = ({
@@ -30,8 +32,10 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
   onRatioChange,
   onStrengthChange,
   onSeedChange,
+  onClarityChange,
   isCollapsed,
   onCollapsedChange,
+  clarity,
 }) => {
   // 获取存储键
   const getStorageKey = (baseKey: keyof typeof STORAGE_KEYS) => {
@@ -71,6 +75,9 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     }
     return undefined;
   });
+
+  // 是否显示清晰度选择器（仅当选择"图片 3.0"时显示）
+  const showClaritySelector = selectedModel.name.includes("图片 3.0");
 
   // 保存参数到本地存储
   useEffect(() => {
@@ -122,6 +129,13 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
     }
   };
 
+  // 处理清晰度变化
+  const handleClarityChange = (value: string) => {
+    if (onClarityChange) {
+      onClarityChange(value);
+    }
+  };
+
   return (
     <div
       className={`${styles.paramsSection} ${
@@ -155,6 +169,9 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
         <div className={styles.paramsSummary}>
           {selectedModel.name.split(" - ")[0]} · 精细度 {strength} ·{" "}
           {selectedRatio.ratio}
+          {showClaritySelector
+            ? ` · ${clarity === "2k" ? "高清" : "标清"}`
+            : ""}
         </div>
       </div>
 
@@ -181,6 +198,44 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
             onRatioChange={setSelectedRatio}
           />
         </div>
+
+        {showClaritySelector && (
+          <div
+            className={`${styles.controlGroup} ${styles.clarityControlGroup}`}
+          >
+            <label className={styles.clarityLabel}>清晰度</label>
+            <div
+              className={`${styles.radioGroup} ${styles.radioGroupHorizontal}`}
+            >
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelHorizontal}`}
+              >
+                <input
+                  type="radio"
+                  name="clarity"
+                  value="1k"
+                  checked={clarity === "1k"}
+                  onChange={() => handleClarityChange("1k")}
+                  className={styles.radioInput}
+                />
+                <span className={styles.radioText}>标清 1k</span>
+              </label>
+              <label
+                className={`${styles.radioLabel} ${styles.radioLabelHorizontal}`}
+              >
+                <input
+                  type="radio"
+                  name="clarity"
+                  value="2k"
+                  checked={clarity === "2k"}
+                  onChange={() => handleClarityChange("2k")}
+                  className={styles.radioInput}
+                />
+                <span className={styles.radioText}>高清 2k</span>
+              </label>
+            </div>
+          </div>
+        )}
 
         <div className={styles.controlGroup}>
           <label>Seed值</label>
