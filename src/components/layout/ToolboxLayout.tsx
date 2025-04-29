@@ -33,12 +33,6 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
     return undefined;
   });
   const [isAIAssistant, setIsAIAssistant] = useState(false);
-  const [isVisible, setIsVisible] = useState(() => {
-    // 从本地存储获取显示状态，默认为隐藏
-    const savedVisibility = localStorage.getItem(STORAGE_KEYS.TOOL_VISIBLE);
-    return savedVisibility === "true";
-    // return ;
-  });
   const [iconUrl, setIconUrl] = useState("");
   const [position, setPosition] = useState<Position>(() => {
     const savedPosition = localStorage.getItem(STORAGE_KEYS.TOOL_POSITION);
@@ -97,9 +91,7 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
           // 检查是否是 AI 助手工具
           setIsAIAssistant(toolToSelect.name === "AI 助手");
 
-          // 确保工具箱可见
-          setIsVisible(true);
-          localStorage.setItem(STORAGE_KEYS.TOOL_VISIBLE, "true");
+          // 工具箱的显示状态现在由UIManager管理，不需要在这里设置
         }
       }
     } catch (error) {
@@ -110,25 +102,6 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
   useEffect(() => {
     // 设置图标URL
     setIconUrl(chrome.runtime.getURL("icons/icon128.png"));
-  }, []);
-
-  // 监听插件图标点击事件
-  useEffect(() => {
-    const handleExtensionIconClick = () => {
-      setIsVisible((prev) => {
-        const newValue = !prev;
-        // 保存新的显示状态到本地存储
-        localStorage.setItem(STORAGE_KEYS.TOOL_VISIBLE, newValue.toString());
-        return newValue;
-      });
-    };
-
-    // 注册消息监听
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.type === "TOGGLE_TOOLBOX") {
-        handleExtensionIconClick();
-      }
-    });
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -270,9 +243,8 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
   };
 
   const handleClose = () => {
-    setIsVisible(false);
-    // 保存显示状态到本地存储
-    localStorage.setItem(STORAGE_KEYS.TOOL_VISIBLE, "false");
+    // 通过消息通知 background 切换工具箱状态
+    chrome.runtime.sendMessage({ action: "toggleToolbox" });
   };
 
   // 添加宽度变化监听
@@ -471,7 +443,6 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
     <div
       className={styles.toolbox}
       ref={toolboxRef}
-      onMouseDown={handleMouseDown}
       style={{
         ...(position
           ? { left: `${position.x}px`, top: `${position.y}px`, right: "auto" }
@@ -480,15 +451,14 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
         width: toolWidth ? `${toolWidth}px` : undefined,
       }}
     >
-      <div className={styles.header}>
-        <div className={styles.dragHandle}>
-          {[...Array(9)].map((_, i) => (
-            <span key={i} />
-          ))}
-        </div>
+      <div className={styles.header} onMouseDown={handleMouseDown}>
         <div className={styles.titleWrapper}>
           {selectedTool ? (
-            <button className={styles.backButton} onClick={handleBack}>
+            <button
+              className={styles.backButton}
+              onClick={handleBack}
+              title="返回主菜单"
+            >
               <svg
                 width="16"
                 height="16"
@@ -504,7 +474,7 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
           ) : (
             <>
               <div className={styles.icon}>
-                {iconUrl && <img src={iconUrl} alt="Dreamina Icon" />}
+                {iconUrl && <img src={iconUrl} alt="即梦工具箱" />}
               </div>
               <h1 className={styles.title}>{title || "即梦工具箱"}</h1>
             </>
