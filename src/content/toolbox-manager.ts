@@ -59,10 +59,12 @@ export class ToolboxManager implements IToolboxManager {
    * @returns 切换后的状态(是否活跃)
    */
   public toggle(): boolean {
+    const prevState = this.isActive;
     this.isActive = !this.isActive;
-    console.log(`工具箱状态: ${this.isActive ? '激活' : '隐藏'}`);
+    console.log(`工具箱状态切换: ${prevState ? '激活' : '隐藏'} -> ${this.isActive ? '激活' : '隐藏'}`);
     
     // 更新工具箱容器的显示状态
+    console.log(`调用 UIManager.updateVisibility(${this.isActive})`);
     this.uiManager.updateVisibility(this.isActive);
     
     // 触发自定义DOM检查事件

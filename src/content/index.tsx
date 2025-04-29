@@ -68,7 +68,19 @@ function initializeToolboxUI(): HTMLElement {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <ToolboxLayout tools={tools} />
+      <ToolboxLayout
+        tools={tools}
+        onClose={() => {
+          // 工具箱关闭回调
+          console.log("工具箱关闭回调被触发");
+          jimengToolsManager?.toggle();
+          // uiManager.updateVisibility(false);
+        }}
+        onToolSelect={(tool) => {
+          // 工具选择回调
+          console.log("工具选择回调被触发:", tool ? tool.name : "返回主菜单");
+        }}
+      />
     </React.StrictMode>
   );
 
@@ -108,14 +120,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Content script received message:", message);
 
   if (message.action === "toggleToolbox") {
-    const now = Date.now();
-    if (now - lastToggleTime < TOGGLE_DEBOUNCE_TIME) {
-      console.log("忽略重复的toggleToolbox消息");
-      sendResponse({ success: false, error: "消息过于频繁，已忽略" });
-      return true;
-    }
-    lastToggleTime = now;
-
+    console.log("处理 toggleToolbox 消息");
     if (!jimengToolsManager) {
       console.log("工具箱管理器未初始化");
       sendResponse({ success: false, error: "工具箱未初始化" });
@@ -123,7 +128,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     // 使用管理器的toggle方法切换显示状态
-    const isActive = jimengToolsManager.toggle();
+    console.log("调用 jimengToolsManager.toggle()");
+    jimengToolsManager.toggle();
     const status = jimengToolsManager.getStatus();
     console.log("切换工具箱状态:", status);
     sendResponse({ success: true, status });

@@ -8,6 +8,9 @@ interface ToolboxLayoutProps {
   children?: React.ReactNode;
   title?: string;
   padding?: number;
+  // 添加UI控制能力的接口
+  onClose?: () => void;
+  onToolSelect?: (tool: Tool | null) => void;
 }
 
 interface Position {
@@ -20,6 +23,8 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
   children,
   title,
   padding = 0,
+  onClose,
+  onToolSelect,
 }) => {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [toolWidth, setToolWidth] = useState<number | undefined>(() => {
@@ -90,8 +95,6 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
 
           // 检查是否是 AI 助手工具
           setIsAIAssistant(toolToSelect.name === "AI 助手");
-
-          // 工具箱的显示状态现在由UIManager管理，不需要在这里设置
         }
       }
     } catch (error) {
@@ -212,6 +215,11 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
     setToolWidth(savedWidth ? parseInt(savedWidth) : tool.defaultWidth);
     // 检查是否是 AI 助手工具
     setIsAIAssistant(tool.name === "AI 助手");
+
+    // 通知外部工具已选择
+    if (onToolSelect) {
+      onToolSelect(tool);
+    }
   };
 
   const handleBack = () => {
@@ -229,6 +237,11 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
     setSelectedTool(null);
     setToolWidth(undefined);
     setIsAIAssistant(false);
+
+    // 通知外部工具已取消选择
+    if (onToolSelect) {
+      onToolSelect(null);
+    }
 
     // 如果是从 AI 助手返回，则调整位置，保持右边框不动
     if (isFromAIAssistant && toolboxRef.current) {
@@ -259,8 +272,10 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
   };
 
   const handleClose = () => {
-    // 通过消息通知 background 切换工具箱状态
-    chrome.runtime.sendMessage({ action: "toggleToolbox" });
+    // 通过 props 回调关闭工具箱
+    if (onClose) {
+      onClose();
+    }
   };
 
   // 添加宽度变化监听
