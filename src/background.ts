@@ -1,7 +1,27 @@
 // 监听扩展图标点击事件
+// 添加防抖机制，避免短时间内多次触发
+let lastClickTime = 0;
+const DEBOUNCE_TIME = 500; // 防抖时间间隔，单位毫秒
+
+// 添加全局类型声明
+declare global {
+  interface Window {
+    __STOP_GENERATING__: boolean;
+    __BATCH_GENERATING__: boolean;
+    __debugger: any;
+  }
+}
+
 chrome.action.onClicked.addListener((tab) => {
+  const now = Date.now();
+  if (now - lastClickTime < DEBOUNCE_TIME) {
+    console.log('点击过于频繁，忽略本次点击');
+    return;
+  }
+  
+  lastClickTime = now;
   if (tab.id) {
-    chrome.tabs.sendMessage(tab.id, { type: 'TOGGLE_TOOLBOX' });
+    chrome.tabs.sendMessage(tab.id, { action: 'toggleToolbox' });
   }
 });
 

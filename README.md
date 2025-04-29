@@ -1,6 +1,127 @@
-# 即梦工具箱 Chrome 扩展
+# 即梦工具箱
 
-一个集成了多种创作辅助功能的 Chrome 扩展工具箱，专为提升创作效率而设计。
+## 架构设计
+
+### 1. DOM 引擎架构
+
+即梦工具箱采用了模块化、可扩展的 DOM 引擎架构，用于在即梦网站上进行 DOM 增强和功能扩展。主要组成部分包括：
+
+#### 核心引擎 (DreaminaDOMEngine)
+
+- 负责管理所有功能模块和规则引擎
+- 监听 DOM 变化和路由变化
+- 控制特性的生命周期（初始化、应用、销毁）
+
+#### 规则引擎系统
+
+- **路由规则引擎**: 基于 URL 路径匹配
+- **DOM 规则引擎**: 基于 DOM 元素匹配
+- **组合规则引擎**: 支持 AND、OR、NOT 逻辑组合
+
+#### 特性模块系统
+
+- 基于统一接口的可扩展特性模块
+- 支持动态注册和注销
+- 基于规则系统的条件触发
+
+#### 特性工厂
+
+- 支持从配置动态创建特性
+- 管理特性类型注册
+
+### 2. 使用方法
+
+#### 创建新特性
+
+```typescript
+// 创建新特性类
+class MyCustomFeature extends BaseFeature {
+  constructor(options) {
+    super({
+      id: "myCustomFeature",
+      name: "自定义特性",
+      // 定义特性触发规则
+      rules: [
+        {
+          type: "route",
+          pattern: "/my-page",
+        },
+      ],
+      ...options,
+    });
+  }
+
+  // 实现特性应用逻辑
+  apply() {
+    if (!super.apply()) return false;
+
+    // 执行DOM操作
+    // ...
+
+    return true;
+  }
+}
+
+// 注册特性类型
+featureFactory.registerFeatureType("myCustomFeature", MyCustomFeature);
+
+// 创建特性实例
+const feature = featureFactory.createFeature("myCustomFeature", {
+  // 特性配置选项
+});
+```
+
+#### 规则配置示例
+
+```typescript
+// 路由规则
+{
+  type: 'route',
+  pattern: '/detail', // 匹配路径前缀
+  exact: false // 是否精确匹配
+}
+
+// DOM规则
+{
+  type: 'dom',
+  selector: '.my-element', // CSS选择器
+  count: 2 // 或 { min: 1, max: 3 } 元素数量条件
+}
+
+// 组合规则
+{
+  type: 'combined',
+  operator: 'AND', // 或 'OR', 'NOT'
+  rules: [
+    { type: 'route', pattern: '/detail' },
+    { type: 'dom', selector: '.operation-buttons-area' }
+  ]
+}
+```
+
+### 3. 开发与测试
+
+```bash
+# 安装依赖
+npm install
+
+# 开发模式
+npm run dev
+
+# 运行测试
+npm test
+
+# 带覆盖率的测试
+npm run test:coverage
+
+# 构建生产版本
+npm run build
+```
+
+## 已实现功能
+
+- [x] 添加视频音频处理功能
+- [x] 批量生成功能
 
 ## 功能特性
 

@@ -1,31 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ES2020",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "outDir": "./dist",
-    "types": ["chrome", "node"],
-    "typeRoots": ["./node_modules/@types"],
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "esModuleInterop": true,
+    "strict": true,
     "jsx": "react",
-    "allowJs": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["src/components/*"],
-      "@styles/*": ["src/styles/*"],
-      "@utils/*": ["src/utils/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@services/*": ["src/services/*"],
-      "@lame/*": ["src/lame/*"]
-    }
+      "*": ["node_modules/*"]
+    },
+    "types": ["node", "jest", "@jest/globals", "chrome"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

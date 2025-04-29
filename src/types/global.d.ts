@@ -1,3 +1,14 @@
+/**
+ * 全局类型定义
+ */
+
+interface Window {
+  /**
+   * 即梦工具API
+   */
+  __DreaminaTool: any;
+}
+
 declare global {
   interface Window {
     __debugger: {
