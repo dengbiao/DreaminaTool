@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.61% </span>
+                <span class="strong">4.76% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/21</span>
+                <span class='fraction'>1/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/20</span>
+                <span class='fraction'>1/20</span>
             </div>
         
             
@@ -187,13 +187,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -202,15 +195,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -223,8 +223,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -272,14 +272,14 @@ export default class RouteRuleEngine implements RuleEngine {
   /**
    * 评估路由规则
    */
-  evaluate(rule: Rule, context: RuleContext): boolean {
-    const routeRule = rule as RouteRule;
-    const { pattern, exact, exclude } = routeRule;
-    const currentPath = window.location.pathname;
-    const currentUrl = window.location.href;
+<span class="fstat-no" title="function not covered" >  evaluate(</span>rule: Rule, context: RuleContext): boolean {
+    const routeRule = <span class="cstat-no" title="statement not covered" >rule as RouteRule;</span>
+    const { pattern, exact, exclude } = <span class="cstat-no" title="statement not covered" >routeRule;</span>
+    const currentPath = <span class="cstat-no" title="statement not covered" >window.location.pathname;</span>
+    const currentUrl = <span class="cstat-no" title="statement not covered" >window.location.href;</span>
     
     // 处理排除规则
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (exclude) {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (exclude) {</span>
 <span class="cstat-no" title="statement not covered" >      if (Array.isArray(exclude)) {</span>
 <span class="cstat-no" title="statement not covered" >        for (const exPath of exclude) {</span>
 <span class="cstat-no" title="statement not covered" >          <span class="missing-if-branch" title="if path not taken" >I</span>if (this._matchPath(currentPath, currentUrl, exPath, exact)) {</span>
@@ -292,25 +292,25 @@ export default class RouteRuleEngine implements RuleEngine {
     }
     
     // 处理包含规则
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(pattern)) {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(pattern)) {</span>
 <span class="cstat-no" title="statement not covered" >      return pattern.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; <span class="cstat-no" title="statement not covered" >this._matchPath(currentPath, currentUrl, path, exact))</span>;</span>
     }
     
-    return this._matchPath(currentPath, currentUrl, pattern, exact);
+<span class="cstat-no" title="statement not covered" >    return this._matchPath(currentPath, currentUrl, pattern, exact);</span>
   }
   
   /**
    * 路径匹配判断
    */
-  private _matchPath(
+  private <span class="fstat-no" title="function not covered" >_matchPath(</span>
     currentPath: string, 
     currentUrl: string, 
     pattern: string | RegExp, 
     exact?: boolean
   ): boolean {
     // 处理正则表达式
-    if (pattern instanceof RegExp) {
-      return pattern.test(currentUrl);
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (pattern instanceof RegExp) {</span>
+<span class="cstat-no" title="statement not covered" >      return pattern.test(currentUrl);</span>
     }
     
     // 处理精确匹配
@@ -328,7 +328,7 @@ export default class RouteRuleEngine implements RuleEngine {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-28T15:21:18.501Z
+                at 2025-04-29T17:13:25.429Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

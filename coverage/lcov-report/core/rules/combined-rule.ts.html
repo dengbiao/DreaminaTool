@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">11.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/18</span>
+                <span class='fraction'>2/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.44% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">20% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/5</span>
+                <span class='fraction'>1/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.33% </span>
+                <span class="strong">13.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/15</span>
+                <span class='fraction'>2/15</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -175,31 +175,31 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -254,31 +254,31 @@ export default class CombinedRuleEngine implements RuleEngine {
   /**
    * 评估组合规则
    */
-  evaluate(rule: Rule, context: RuleContext): boolean {
-    const combinedRule = rule as CombinedRule;
-    const { operator, rules } = combinedRule;
+<span class="fstat-no" title="function not covered" >  evaluate(</span>rule: Rule, context: RuleContext): boolean {
+    const combinedRule = <span class="cstat-no" title="statement not covered" >rule as CombinedRule;</span>
+    const { operator, rules } = <span class="cstat-no" title="statement not covered" >combinedRule;</span>
     
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!rules || !Array.isArray(rules) || rules.length === 0) {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!rules || !Array.isArray(rules) || rules.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return false;</span>
     }
     
     // 获取各子规则的评估结果
-    const results = rules.map(subRule =&gt; {
-      const ruleEngine = this.engine.ruleEngines.get(subRule.type);
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (!ruleEngine) <span class="cstat-no" title="statement not covered" >return false;</span>
-      return ruleEngine.evaluate(subRule, context);
+    const results = <span class="cstat-no" title="statement not covered" >rules.map(<span class="fstat-no" title="function not covered" >subRule </span>=&gt; {</span>
+      const ruleEngine = <span class="cstat-no" title="statement not covered" >this.engine.ruleEngines.get(subRule.type);</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!ruleEngine) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >      return ruleEngine.evaluate(subRule, context);</span>
     });
     
     // 根据操作符组合结果
-    switch (operator) {
+<span class="cstat-no" title="statement not covered" >    switch (operator) {</span>
       case 'AND':
-        return results.every(result =&gt; result === true);
-<span class="branch-1 cbranch-no" title="branch not covered" >      case 'OR':</span>
+<span class="cstat-no" title="statement not covered" >        return results.every(<span class="fstat-no" title="function not covered" >result </span>=&gt; <span class="cstat-no" title="statement not covered" >result === true)</span>;</span>
+      case 'OR':
 <span class="cstat-no" title="statement not covered" >        return results.some(<span class="fstat-no" title="function not covered" >result </span>=&gt; <span class="cstat-no" title="statement not covered" >result === true)</span>;</span>
-<span class="branch-2 cbranch-no" title="branch not covered" >      case 'NOT':</span>
+      case 'NOT':
         // 对于NOT，只考虑第一个规则
 <span class="cstat-no" title="statement not covered" >        return !results[0];</span>
-<span class="branch-3 cbranch-no" title="branch not covered" >      default:</span>
+      default:
 <span class="cstat-no" title="statement not covered" >        return false;</span>
     }
   }
@@ -289,7 +289,7 @@ export default class CombinedRuleEngine implements RuleEngine {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-28T15:21:18.501Z
+                at 2025-04-29T17:13:25.429Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -39,9 +39,10 @@ export default class ImageMattingButtonFeature extends BaseFeature {
     const rules: Rule[] = [
       {
         type: 'dom',
-        selector: '.group-I9vSBL',  // 查找包含所有按钮的容器
+        selector: '.workDetailWrap-\\w+', // 匹配 .workDetailWrap-xxxx 类
         triggerOn: ['dom', 'route', 'custom'],
-        checkInterval: 2000 // 每2秒检查一次
+        checkInterval: 2000, // 每2秒检查一次
+        onRemove: true // 当匹配的DOM元素被移除时触发destroy
       }
     ];
     
@@ -61,29 +62,82 @@ export default class ImageMattingButtonFeature extends BaseFeature {
   }
 
   /**
-   * 查找消除笔按钮的元素
-   * @returns 消除笔按钮元素
+   * 查找编辑组和消除笔按钮
+   * @returns 消除笔按钮元素和编辑组元素
    */
-  private findEraserButtonElement(): HTMLElement | null {
-    // 查找所有有消除笔文本的按钮
-    const allSpans = document.querySelectorAll('span');
-    for (const span of Array.from(allSpans)) {
-      if (span.textContent === '消除笔') {
-        // 找到消除笔按钮的父元素
-        return span.closest('.optItem-CQDvy5') as HTMLElement;
+  private findTargetElements(): { eraserButton: HTMLElement | null, editGroup: HTMLElement | null } {
+    try {
+      // 1. 找到 .workDetailWrap-xxxx 容器
+      const workDetailWrap = document.querySelector('[class^="workDetailWrap-"]') as HTMLElement;
+      if (!workDetailWrap) {
+        console.log('未找到工作详情包装器');
+        return { eraserButton: null, editGroup: null };
       }
+      
+      // 2. 找到包含"编辑"文本的 groupName 元素
+      const groupNames = workDetailWrap.querySelectorAll('[class^="groupName-"]');
+      let editGroupName = null;
+      for (const element of Array.from(groupNames)) {
+        if (element.textContent === '编辑') {
+          editGroupName = element;
+          break;
+        }
+      }
+      
+      if (!editGroupName) {
+        console.log('未找到编辑组名称');
+        return { eraserButton: null, editGroup: null };
+      }
+      
+      // 3. 找到编辑组名称后面的 group 元素
+      const editGroup = editGroupName.nextElementSibling as HTMLElement;
+      if (!editGroup || !editGroup.className.includes('group-')) {
+        console.log('未找到编辑组元素');
+        return { eraserButton: null, editGroup: null };
+      }
+      
+      // 4. 找到编辑组中的所有操作项
+      const optItems = editGroup.querySelectorAll('[class^="optItem-"]');
+      if (!optItems.length) {
+        console.log('未找到操作项');
+        return { eraserButton: null, editGroup: null };
+      }
+      
+      // 5. 找到最后一个操作项，应该是消除笔
+      const lastOptItem = optItems[optItems.length - 1] as HTMLElement;
+      
+      // 验证是否是消除笔按钮
+      const svgElement = lastOptItem.querySelector('svg');
+      const spanElement = lastOptItem.querySelector('span');
+      
+      if (spanElement && spanElement.textContent === '消除笔') {
+        return { eraserButton: lastOptItem, editGroup: editGroup };
+      } else {
+        // 如果最后一个不是消除笔，尝试找到文本为"消除笔"的按钮
+        for (const item of Array.from(optItems)) {
+          const span = item.querySelector('span');
+          if (span && span.textContent === '消除笔') {
+            return { eraserButton: item as HTMLElement, editGroup: editGroup };
+          }
+        }
+        console.log('未找到消除笔按钮');
+        return { eraserButton: null, editGroup: editGroup };
+      }
+    } catch (error) {
+      console.error('查找目标元素时出错:', error);
+      return { eraserButton: null, editGroup: null };
     }
-    return null;
   }
 
   /**
    * 检查是否已经添加了抠图按钮
    */
   private hasImageMattingButton(): boolean {
-    const allSpans = document.querySelectorAll('span');
-    for (const span of Array.from(allSpans)) {
-      if (span.textContent === this.buttonConfig.text && 
-          span.closest('.dreamina-matting-button')) {
+    const allButtons = document.querySelectorAll('[class^="optItem-"]');
+    for (const button of Array.from(allButtons)) {
+      const span = button.querySelector('span');
+      if (span && span.textContent === this.buttonConfig.text && 
+          button.classList.contains('dreamina-matting-button')) {
         return true;
       }
     }
@@ -103,30 +157,37 @@ export default class ImageMattingButtonFeature extends BaseFeature {
     }
     
     try {
-      // 查找消除笔按钮
-      const eraserButton = this.findEraserButtonElement();
-      if (!eraserButton) {
-        if (this.engine?.logger) {
-          this.engine.logger.error('未找到消除笔按钮');
-        }
-        return false;
-      }
+      // 查找目标元素
+      const { eraserButton, editGroup } = this.findTargetElements();
       
-      // 获取消除笔按钮的父元素容器
-      const buttonContainer = eraserButton.parentElement;
-      if (!buttonContainer) {
+      if (!editGroup) {
         if (this.engine?.logger) {
-          this.engine.logger.error('未找到按钮容器');
+          this.engine.logger.error('未找到编辑组');
         }
         return false;
       }
       
       // 创建抠图按钮元素
       const buttonElement = document.createElement('div');
-      buttonElement.className = eraserButton.className; // 复制同样的类名保持样式一致
+      
+      // 如果找到了消除笔按钮，复制它的类名
+      if (eraserButton) {
+        buttonElement.className = eraserButton.className;
+      } else {
+        // 否则，尝试从编辑组中找一个操作项作为模板
+        const optItems = editGroup.querySelectorAll('[class^="optItem-"]');
+        if (optItems.length > 0) {
+          buttonElement.className = optItems[0].className;
+        } else {
+          // 如果找不到任何模板，使用一个通用类名
+          buttonElement.className = 'optItem-common';
+        }
+      }
+      
+      // 添加自定义类名，方便识别
       buttonElement.classList.add('dreamina-matting-button');
       
-      // 复制SVG图标样式，创建一个新的SVG图标
+      // 创建SVG图标
       const svgIcon = `
         <svg width="1em" height="1em" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" fill="none" role="presentation" xmlns="http://www.w3.org/2000/svg" class="">
           <g>
@@ -141,8 +202,8 @@ export default class ImageMattingButtonFeature extends BaseFeature {
       // 为按钮添加点击事件
       buttonElement.addEventListener('click', this.buttonConfig.onClick);
       
-      // 将按钮添加到消除笔按钮后面
-      buttonContainer.insertBefore(buttonElement, eraserButton.nextSibling);
+      // 将按钮添加到编辑组的末尾
+      editGroup.appendChild(buttonElement);
       
       this.buttonAdded = true;
       
@@ -174,12 +235,21 @@ export default class ImageMattingButtonFeature extends BaseFeature {
   destroy(): void {
     // 移除已添加的按钮
     if (this.buttonAdded) {
-      const button = document.querySelector('.dreamina-matting-button');
-      if (button) {
+      console.log('抠图按钮特性正在销毁...');
+      
+      // 查找并移除所有抠图按钮
+      const buttons = document.querySelectorAll('.dreamina-matting-button');
+      buttons.forEach(button => {
         button.remove();
-      }
+      });
+      
       this.buttonAdded = false;
+      
+      this.engine?.logger.log('抠图按钮已被移除');
     }
+    
+    // 重置状态，以便下次可以重新添加
+    this.buttonAdded = false;
     
     super.destroy();
   }

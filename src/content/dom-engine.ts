@@ -66,14 +66,5 @@ export function exposeGlobalAPI() {
   // @ts-ignore - 全局扩展
   window.__DreaminaTool = api;
   
-  // 特别为特定功能创建实例
-  api.featureFactory.createFeature('imageMattingButton', {
-    buttonText: '抠图',
-    onClick: (e: MouseEvent) => {
-      console.log('抠图按钮被点击', e);
-      alert('抠图功能已启动！');
-    }
-  });
-  
   return api;
 } 

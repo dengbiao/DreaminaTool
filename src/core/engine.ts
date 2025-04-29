@@ -193,9 +193,24 @@ export default class DreaminaDOMEngine {
    * @param trigger 触发类型
    */
   checkAndApplyFeatures(mutations: MutationRecord[] | null = null, trigger: string = 'dom'): void {
+    // 第一轮：检查所有特性的DOM元素变化，处理onRemove场景
+    if (trigger === 'dom') {
+      for (const [id, feature] of this.features.entries()) {
+        try {
+          // 检查特性是否满足条件，但不应用
+          this.shouldApplyFeature(feature, mutations, trigger);
+          // DOM规则引擎会在evaluate内部处理onRemove并调用destroy，所以这里不需要额外处理
+        } catch (err) {
+          this.logger.error(`检查特性[${id}]状态失败:`, err);
+        }
+      }
+    }
+    
+    // 第二轮：应用满足条件的特性
     for (const [id, feature] of this.features.entries()) {
       try {
-        if (this.shouldApplyFeature(feature, mutations, trigger)) {
+        // 只应用未应用且应该应用的特性
+        if (!feature.applied && this.shouldApplyFeature(feature, mutations, trigger)) {
           feature.apply();
           this.logger.log(`功能[${id}]已应用`);
         }
@@ -212,23 +227,21 @@ export default class DreaminaDOMEngine {
    * @param trigger 触发类型
    */
   shouldApplyFeature(feature: Feature, mutations: MutationRecord[] | null, trigger: string): boolean {
-    // 基础检查：功能自身的shouldApply方法
-    if (feature.shouldApply && !feature.shouldApply()) {
-      return false;
-    }
-    
     // 检查功能的激活规则
     if (!feature.rules || feature.rules.length === 0) {
       // 没有规则，默认激活
-      return true;
+      return !feature.applied;
     }
     
-    // 至少一条规则满足即可激活
-    return feature.rules.some(rule => {
+    // 检查每条规则
+    const shouldApplyOrRemove = feature.rules.some(rule => {
       // 检查规则类型是否匹配当前触发类型
       if (rule.triggerOn && !rule.triggerOn.includes(trigger)) {
         return false;
       }
+      
+      // 添加featureId到规则中，用于元素移除时找到对应的功能实例
+      rule.featureId = feature.id;
       
       // 使用对应的规则引擎评估规则
       const ruleEngine = this.ruleEngines.get(rule.type);
@@ -237,8 +250,23 @@ export default class DreaminaDOMEngine {
         return false;
       }
       
-      return ruleEngine.evaluate(rule, { mutations, trigger });
+      // 检查规则是否包含onRemove属性，即使特性已经应用过，也需要检查元素是否被移除
+      const hasOnRemove = rule.onRemove === true;
+      
+      // 评估规则
+      const result = ruleEngine.evaluate(rule, { mutations, trigger, engine: this });
+      
+      // 如果规则评估为false且包含onRemove属性且特性已应用过，可能是因为元素已移除
+      // DOM规则引擎会在evaluate方法内部处理onRemove情况，但此处需要返回false，避免重复应用
+      if (!result && hasOnRemove && feature.applied) {
+        return false;
+      }
+      
+      return result;
     });
+    
+    // 只有当特性未应用过或者有规则满足时才应用特性
+    return shouldApplyOrRemove && (!feature.shouldApply || feature.shouldApply());
   }
 
   /**

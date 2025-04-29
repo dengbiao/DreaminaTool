@@ -4,7 +4,6 @@
  */
 
 import type FeatureFactory from '../core/feature-factory';
-import DetailPageButtonFeature from './detail-page-button';
 import ImageMattingButtonFeature from './image-matting-button';
 
 /**
@@ -12,8 +11,6 @@ import ImageMattingButtonFeature from './image-matting-button';
  * @param factory 特性工厂实例
  */
 export function registerFeatureTypes(factory: FeatureFactory): void {
-  // 注册详情页按钮特性
-  factory.registerFeatureType('detailPageButton', DetailPageButtonFeature);
   
   // 注册抠图按钮特性
   factory.registerFeatureType('imageMattingButton', ImageMattingButtonFeature);
@@ -26,24 +23,10 @@ export function registerFeatureTypes(factory: FeatureFactory): void {
  */
 export const defaultFeatures = [
   {
-    type: 'detailPageButton',
-    options: { 
-      buttonText: '自定义导出',
-      onClick: () => { alert('导出功能'); }
-    }
-  },
-  {
     type: 'imageMattingButton',
-    options: {
-      buttonText: '抠图',
-      onClick: (e: MouseEvent) => { 
-        console.log('抠图功能被触发');
-        alert('抠图功能已启动！'); 
-      }
-    }
   },
   // 其他特性配置...
 ];
 
 // 重新导出特性类
-export { DetailPageButtonFeature, ImageMattingButtonFeature }; 
+export { ImageMattingButtonFeature }; 
