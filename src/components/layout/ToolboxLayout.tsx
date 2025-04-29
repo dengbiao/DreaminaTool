@@ -113,6 +113,8 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
       isResizingRef.current = true;
       startHeightRef.current = toolboxRef.current.offsetHeight;
       startYRef.current = e.clientY;
+      // 防止事件冒泡，避免触发拖拽
+      e.stopPropagation();
       return;
     }
 
@@ -128,6 +130,20 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
       x: e.clientX - currentX,
       y: e.clientY - currentY,
     };
+  };
+
+  // 确保整个组件范围都能检测底部 resizeHandle 的点击
+  const handleResizeHandleClick = (e: React.MouseEvent) => {
+    if (!toolboxRef.current) return;
+
+    const target = e.target as HTMLElement;
+    if (target.closest(`.${styles.resizeHandle}`)) {
+      console.log("开始调整高度");
+      isResizingRef.current = true;
+      startHeightRef.current = toolboxRef.current.offsetHeight;
+      startYRef.current = e.clientY;
+      e.stopPropagation();
+    }
   };
 
   useEffect(() => {
@@ -522,7 +538,12 @@ export const ToolboxLayout: React.FC<ToolboxLayoutProps> = ({
           children
         )}
       </div>
-      <div className={styles.resizeHandle} />
+      <div
+        className={styles.resizeHandle}
+        onMouseDown={handleResizeHandleClick}
+        style={{ cursor: "ns-resize", zIndex: 1000 }}
+        title="拖动调整高度"
+      />
     </div>
   );
 };
