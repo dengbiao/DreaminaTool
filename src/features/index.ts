@@ -18,14 +18,14 @@ export function registerFeatureTypes(factory: FeatureFactory): void {
   // 注册抠图按钮特性
   factory.registerFeatureType('imageMattingButton', ImageMattingButtonFeature);
   
-  // 注册隐藏参考图文本特性
-  factory.registerFeatureType('hideReferenceText', HideReferenceTextFeature);
+  // // 注册隐藏参考图文本特性
+  // factory.registerFeatureType('hideReferenceText', HideReferenceTextFeature);
   
-  // 注册批量模式按钮特性
-  factory.registerFeatureType('batchModeButton', BatchModeButtonFeature);
+  // // 注册批量模式按钮特性
+  // factory.registerFeatureType('batchModeButton', BatchModeButtonFeature);
   
-  // 注册隐藏引号按钮特性
-  factory.registerFeatureType('hideQuotationMarks', HideQuotationMarksFeature);
+  // // 注册隐藏引号按钮特性
+  // factory.registerFeatureType('hideQuotationMarks', HideQuotationMarksFeature);
   
   // 在此注册其他特性类型...
 }
@@ -37,15 +37,15 @@ export const defaultFeatures = [
   {
     type: 'imageMattingButton',
   },
-  {
-    type: 'hideReferenceText',
-  },
-  {
-    type: 'batchModeButton',
-  },
-  {
-    type: 'hideQuotationMarks',
-  },
+  // {
+  //   type: 'hideReferenceText',
+  // },
+  // {
+  //   type: 'batchModeButton',
+  // },
+  // {
+  //   type: 'hideQuotationMarks',
+  // },
   // 其他特性配置...
 ];
 
