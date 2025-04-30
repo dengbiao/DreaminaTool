@@ -7,6 +7,7 @@ import type FeatureFactory from '../core/feature-factory';
 import ImageMattingButtonFeature from './image-matting-button';
 import HideReferenceTextFeature from './hide-reference-text';
 import BatchModeButtonFeature from './batch-mode-button';
+import HideQuotationMarksFeature from './hide-quotation-marks';
 
 /**
  * 注册所有特性类型
@@ -22,6 +23,9 @@ export function registerFeatureTypes(factory: FeatureFactory): void {
   
   // 注册批量模式按钮特性
   factory.registerFeatureType('batchModeButton', BatchModeButtonFeature);
+  
+  // 注册隐藏引号按钮特性
+  factory.registerFeatureType('hideQuotationMarks', HideQuotationMarksFeature);
   
   // 在此注册其他特性类型...
 }
@@ -39,6 +43,9 @@ export const defaultFeatures = [
   {
     type: 'batchModeButton',
   },
+  {
+    type: 'hideQuotationMarks',
+  },
   // 其他特性配置...
 ];
 
@@ -46,5 +53,6 @@ export const defaultFeatures = [
 export { 
   ImageMattingButtonFeature,
   HideReferenceTextFeature,
-  BatchModeButtonFeature
+  BatchModeButtonFeature,
+  HideQuotationMarksFeature
 }; 
