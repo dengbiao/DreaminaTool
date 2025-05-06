@@ -299,47 +299,34 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
 
   // 监听批量生成进度更新
   useEffect(() => {
-    const handleProgressUpdate = (message: any) => {
-      console.log("Received message in BatchGenerator:", message);
-      if (message.type === "BATCH_PROGRESS_UPDATE") {
-        const newProgress = message.progress;
-        setProgress(newProgress);
+    // 统一的进度更新处理函数
+    const updateProgress = (newProgress: any) => {
+      console.log("Updating progress:", newProgress);
+      setProgress(newProgress);
 
-        // 只有当所有任务都完成时（没有运行中和排队中的任务）才结束生成状态
-        if (
-          newProgress.runningTasks === 0 &&
-          newProgress.queueLength === 0 &&
-          newProgress.totalProcessed === newProgress.total
-        ) {
-          setIsGenerating(false);
-        }
+      // 只有当所有任务都完成时（没有运行中和排队中的任务）才结束生成状态
+      if (
+        newProgress.runningTasks === 0 &&
+        newProgress.queueLength === 0 &&
+        newProgress.totalProcessed === newProgress.total
+      ) {
+        setIsGenerating(false);
       }
     };
 
-    // 同时监听 chrome.runtime.onMessage 和 window message
-    const handleWindowMessage = (event: MessageEvent) => {
-      if (event.data.type === "FROM_PAGE_BATCH_PROGRESS_UPDATE") {
-        console.log("Received window message:", event.data);
-        const newProgress = event.data.progress;
-        setProgress(newProgress);
-
-        // 只有当所有任务都完成时（没有运行中和排队中的任务）才结束生成状态
-        if (
-          newProgress.runningTasks === 0 &&
-          newProgress.queueLength === 0 &&
-          newProgress.totalProcessed === newProgress.total
-        ) {
-          setIsGenerating(false);
-        }
+    // 处理生成进度更新的消息
+    const handleProgressUpdateMessage = (event: MessageEvent) => {
+      console.log("Received page message:", event.data);
+      if (event.data.type === "BATCH_PROGRESS_UPDATE") {
+        updateProgress(event.data.progress);
       }
     };
 
-    chrome.runtime.onMessage.addListener(handleProgressUpdate);
-    window.addEventListener("message", handleWindowMessage);
+    window.addEventListener("message", handleProgressUpdateMessage);
 
+    // 清理函数
     return () => {
-      chrome.runtime.onMessage.removeListener(handleProgressUpdate);
-      window.removeEventListener("message", handleWindowMessage);
+      window.removeEventListener("message", handleProgressUpdateMessage);
     };
   }, []);
 

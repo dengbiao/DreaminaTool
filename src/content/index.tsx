@@ -100,21 +100,6 @@ function initializeToolboxManager() {
   }
 }
 
-// 监听来自页面的消息
-window.addEventListener("message", (event) => {
-  // 确保消息来自同一个窗口
-  if (event.source !== window) return;
-
-  // 处理批量生成进度更新
-  if (event.data.type === "FROM_PAGE_BATCH_PROGRESS_UPDATE") {
-    // 转发消息给background script
-    chrome.runtime.sendMessage({
-      type: "BATCH_PROGRESS_UPDATE",
-      progress: event.data.progress,
-    });
-  }
-});
-
 // 监听来自 background 的消息
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Content script received message:", message);
