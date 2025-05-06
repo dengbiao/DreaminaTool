@@ -9,11 +9,11 @@ interface CreateShotResult {
 
 // 在页面上下文中执行代码
 const executeInPageContext = async (
-  descriptions: string[]
+  shotDescriptionsList: string[]
 ): Promise<CreateShotResult[]> => {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(
-      { type: "EXECUTE_IN_PAGE", descriptions },
+      { type: "BATCH_CREATE_SHOTS", shotDescriptionsList },
       (response) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));

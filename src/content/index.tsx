@@ -119,8 +119,8 @@ window.addEventListener("message", (event) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("Content script received message:", message);
 
-  if (message.action === "toggleToolbox") {
-    console.log("处理 toggleToolbox 消息");
+  if (message.action === "TOGGLE_TOOLBOX") {
+    console.log("处理 TOGGLE_TOOLBOX 消息");
     if (!jimengToolsManager) {
       console.log("工具箱管理器未初始化");
       sendResponse({ success: false, error: "工具箱未初始化" });

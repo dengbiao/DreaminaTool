@@ -1,0 +1,20 @@
+/**
+ * 防抖时间间隔（毫秒）
+ */
+export const DEBOUNCE_TIME = 100;
+
+/**
+ * 消息类型常量
+ */
+export const MESSAGE_TYPES = {
+  // 工具箱相关
+  TOGGLE_TOOLBOX: 'TOGGLE_TOOLBOX',
+  
+  // 批量创建分镜相关
+  BATCH_CREATE_SHOTS: 'BATCH_CREATE_SHOTS',
+  
+  // 批量生成相关
+  BATCH_GENERATE: 'BATCH_GENERATE',
+  STOP_BATCH_GENERATE: 'STOP_BATCH_GENERATE',
+  BATCH_PROGRESS_UPDATE: 'FROM_PAGE_BATCH_PROGRESS_UPDATE'
+}; 
