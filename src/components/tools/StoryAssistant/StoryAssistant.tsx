@@ -1,33 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./StoryAssistant.module.scss";
 import { TextInput } from "../../common/TextInput";
-
-interface CreateShotResult {
-  ok: boolean;
-  error?: string;
-}
-
-// 在页面上下文中执行代码
-const executeInPageContext = async (
-  shotDescriptionsList: string[]
-): Promise<CreateShotResult[]> => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      { type: "BATCH_CREATE_SHOTS", shotDescriptionsList },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-          return;
-        }
-        if (!response?.ok) {
-          reject(new Error(response?.error || "执行失败"));
-          return;
-        }
-        resolve(response.results);
-      }
-    );
-  });
-};
+import { batchCreateShots } from "../../../modules/batch-shots/api";
 
 export const StoryAssistant: React.FC = () => {
   const [shots, setShots] = useState<string>("");
@@ -60,7 +34,7 @@ export const StoryAssistant: React.FC = () => {
 
     try {
       const shotList = shots.split("\n").filter((shot) => shot.trim());
-      const results = await executeInPageContext(shotList);
+      const results = await batchCreateShots(shotList);
 
       // 处理结果
       const successCount = results.filter((r) => r.ok).length;

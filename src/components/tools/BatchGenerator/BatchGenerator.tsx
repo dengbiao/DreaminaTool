@@ -6,11 +6,7 @@ import React, {
   useMemo,
 } from "react";
 import styles from "./BatchGenerator.module.scss";
-import {
-  ImageRadioType,
-  ImageGenerateResponse,
-} from "../../../types/imageGenerator";
-import { generateRequestHeaders } from "../../../utils/sign";
+import { ImageRadioType } from "../../../types/imageGenerator";
 import { TabSelector } from "./components/TabSelector";
 import { NormalMode, NormalModeHandle } from "./components/modes/NormalMode";
 import {
@@ -25,7 +21,10 @@ import {
   GenerationParams,
   ProgressInfo,
 } from "./types";
-import BatchGenerationService from "./services/batchGenerationProxy";
+import {
+  startBatchGeneration,
+  stopBatchGeneration,
+} from "../../../modules/batch-generate/api";
 import { StatusBar } from "./components/StatusBar";
 import { ParamsPanel } from "./components/ParamsPanel";
 
@@ -333,9 +332,9 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
   // 处理终止生成
   const handleStop = useCallback(() => {
     setIsStopped(true);
-    // 通过消息机制发送终止信号
-    chrome.runtime.sendMessage({
-      type: "STOP_BATCH_GENERATE",
+    // 使用新的API函数
+    stopBatchGeneration().catch((error) => {
+      console.error("Failed to stop batch generation:", error);
     });
   }, []);
 
@@ -358,7 +357,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
       });
 
       try {
-        await BatchGenerationService.startBatchGeneration(prompts, params);
+        await startBatchGeneration(prompts, params);
         // 移除这里的 setProgress，因为进度会通过消息更新
       } catch (error) {
         setStatus((error as Error).message);
