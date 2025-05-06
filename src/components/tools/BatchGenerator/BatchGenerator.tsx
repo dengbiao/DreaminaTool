@@ -302,7 +302,17 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
     const handleProgressUpdate = (message: any) => {
       console.log("Received message in BatchGenerator:", message);
       if (message.type === "BATCH_PROGRESS_UPDATE") {
-        setProgress(message.progress);
+        const newProgress = message.progress;
+        setProgress(newProgress);
+
+        // 只有当所有任务都完成时（没有运行中和排队中的任务）才结束生成状态
+        if (
+          newProgress.runningTasks === 0 &&
+          newProgress.queueLength === 0 &&
+          newProgress.totalProcessed === newProgress.total
+        ) {
+          setIsGenerating(false);
+        }
       }
     };
 
@@ -310,7 +320,17 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
     const handleWindowMessage = (event: MessageEvent) => {
       if (event.data.type === "FROM_PAGE_BATCH_PROGRESS_UPDATE") {
         console.log("Received window message:", event.data);
-        setProgress(event.data.progress);
+        const newProgress = event.data.progress;
+        setProgress(newProgress);
+
+        // 只有当所有任务都完成时（没有运行中和排队中的任务）才结束生成状态
+        if (
+          newProgress.runningTasks === 0 &&
+          newProgress.queueLength === 0 &&
+          newProgress.totalProcessed === newProgress.total
+        ) {
+          setIsGenerating(false);
+        }
       }
     };
 
@@ -321,7 +341,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
       chrome.runtime.onMessage.removeListener(handleProgressUpdate);
       window.removeEventListener("message", handleWindowMessage);
     };
-  }, [scrollToBottom]);
+  }, []);
 
   // 处理终止生成
   const handleStop = useCallback(() => {
@@ -351,21 +371,10 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
       });
 
       try {
-        const result = await BatchGenerationService.startBatchGeneration(
-          prompts,
-          params
-        );
-        setProgress({
-          totalProcessed: prompts.length,
-          total: prompts.length,
-          queueLength: 0,
-          runningTasks: 0,
-          successCount: result.successCount,
-          failCount: result.failCount,
-        });
+        await BatchGenerationService.startBatchGeneration(prompts, params);
+        // 移除这里的 setProgress，因为进度会通过消息更新
       } catch (error) {
         setStatus((error as Error).message);
-      } finally {
         setIsGenerating(false);
       }
     },
