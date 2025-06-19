@@ -57,4 +57,20 @@ export interface BatchGenerateResponse {
 export interface BatchProgressUpdateMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.BATCH_PROGRESS_UPDATE;
   progress: ProgressUpdate;
+}
+
+/**
+ * 获取模型列表消息
+ */
+export interface GetModelListMessage extends BaseMessage {
+  type: typeof MESSAGE_TYPES.GET_MODEL_LIST;
+}
+
+/**
+ * 获取模型列表响应
+ * 你可以根据实际模型结构调整 models 字段类型
+ */
+export interface GetModelListResponse {
+  models?: any[]; // 这里留空，后续你可以补充具体类型
+  error?: string;
 } 

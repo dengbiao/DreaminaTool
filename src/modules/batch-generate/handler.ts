@@ -4,7 +4,9 @@ import {
   StopBatchGenerateMessage,
   BatchGenerateParams, 
   BatchGenerateResponse, 
-  BatchGenerateResult 
+  BatchGenerateResult, 
+  GetModelListMessage,
+  GetModelListResponse
 } from './types';
 import { MESSAGE_TYPES } from '../../common/constants';
 
@@ -12,7 +14,7 @@ import { MESSAGE_TYPES } from '../../common/constants';
  * 批量生成处理器
  * 处理批量生成和停止批量生成的消息
  */
-export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage | StopBatchGenerateMessage, BatchGenerateResponse | void> {
+export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage | StopBatchGenerateMessage | GetModelListMessage, BatchGenerateResponse | void | GetModelListResponse> {
   /**
    * 处理批量生成相关消息
    * @param message 消息对象
@@ -20,19 +22,21 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
    * @returns 处理结果
    */
   async handleMessage(
-    message: BatchGenerateMessage | StopBatchGenerateMessage, 
+    message: BatchGenerateMessage | StopBatchGenerateMessage | GetModelListMessage, 
     sender: chrome.runtime.MessageSender
-  ): Promise<BatchGenerateResponse | void> {
+  ): Promise<BatchGenerateResponse | void | GetModelListResponse> {
     const tabId = sender.tab?.id;
     if (!tabId) {
       return { error: "无法获取当前标签页" };
     }
 
     if (message.type === MESSAGE_TYPES.BATCH_GENERATE) {
-      return await this.handleBatchGenerate(message.data, tabId);
+      return await this.handleBatchGenerate((message as BatchGenerateMessage).data, tabId);
     } else if (message.type === MESSAGE_TYPES.STOP_BATCH_GENERATE) {
       await this.handleStopBatchGenerate(tabId);
       return;
+    } else if (message.type === MESSAGE_TYPES.GET_MODEL_LIST) {
+      return await this.handleGetModelList(tabId);
     }
     
     throw new Error('未知的消息类型');
@@ -62,34 +66,29 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
           const maxConcurrent = 6; // 最大并发数
           let runningTasks = 0; // 当前运行的任务数
           let queue = [...prompts]; // 任务队列
-
+          const taskIdMap = new Map<string, boolean>();
           try {
             // 获取 imageManager 实例
-            const parent = (window as any).__debugger._containerService._childs.values()
-              .toArray()
-              .find((item: any) =>
-                item.services._entries.values()
-                  .toArray()
-                  .find((child: any) => child.__origin__ && child.__origin__.imageManager)
-              );
+            // @ts-ignore
+            const services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as any;
+            const contentGeneratorFeatureService = services.find((item: { _services: { _entries: { keys: () => { (): any; new(): any; toArray: { (): any[]; new(): any; }; }; }; }; }) => item._services._entries.keys().toArray().find(item => item.toString() === 'content-generator-feature-service'))._services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-feature-service');
+            // const contentGeneratorFeatureService = parent && parent._services.entries.find((_, key) => key.toString() === 'content-generator-feature-service');
 
-            const imageManager = parent && parent.services._entries.values()
-              .toArray()
-              .find((child: any) => child.__origin__ && child.__origin__.imageManager)
-              .__origin__.imageManager;
-
-            if (!imageManager) {
-              throw new Error('无法获取 imageManager');
+            if (!contentGeneratorFeatureService) {
+              console.error('无法获取 contentGeneratorFeatureService');
+              return;
             }
 
-            const paramsManager = imageManager._generateImageParamsManager;
-            if (!paramsManager) {
-              throw new Error('无法获取 _generateImageParamsManager');
+            const imageGeneratorManager = contentGeneratorFeatureService.imageGeneratorManager;
+            if (!imageGeneratorManager) {
+              console.error('无法获取 imageGeneratorManager');
+              // console.error('无法获取 imageGeneratorManager');
+              return;
             }
 
             // 发送进度更新
             const updateProgress = () => {
-              console.log('Sending progress update:', {
+              console.log('handleBatchGenerate', 'Sending progress update:', {
                 successCount,
                 failCount,
                 totalProcessed,
@@ -115,6 +114,7 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
               setTimeout(resolve, 500 + Math.random() * 500)
             );
 
+
             // 处理单个任务
             const processTask = async (prompt: string) => {
               if (window.__STOP_GENERATING__) {
@@ -131,59 +131,84 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
                   return;
                 }
 
-                const proxyParamsManager = new Proxy(paramsManager, {
-                  get(target, prop) {
-                    if (prop === 'canCustomSize') return true;
-                    if (prop === 'selectModelKey') return params.model.value;
-                    if (prop === 'imageRatio') return params.ratio.type;
-                    if (prop === 'prompt') return prompt;
-                    if (prop === 'seed' && params.seed !== undefined) return params.seed;
-                    if (prop === 'selectModel') {
-                      return paramsManager.modelList.find((model: any) => model.modelReqKey === params.model.value);
-                    }
-                    if (prop === 'textToImageGenerateParam') {
-                      const selectModel = paramsManager.modelList.find((model: any) => model.modelReqKey === params.model.value);
-                      return {
-                        ...target.textToImageGenerateParam,
-                        prompt: prompt,
-                        imageRatio: params.ratio.type,
-                        modelConfig: selectModel,
-                        sampleStrength: params.strength,
-                        model: selectModel.modelReqKey,
-                        seed: params.seed ?? target.seed,
-                        largeImageInfo: {
-                          width: params.ratio.width,
-                          height: params.ratio.height,
-                          resolutionType: params.clarity === "2k" ? "2k" : "1k",
-                        },
-                      };
-                    }
-                    return target[prop];
-                  }
-                });
+                // const proxyParamsManager = new Proxy(imageGeneratorManager.data, {
+                //   get(target, prop) {
+                //     if (prop === 'params') {
+                //       const selectModel = imageGeneratorManager.data._metadata.generateImageModelList.find((model: any) => model.modelReqKey === params.model.value);
+                //       return {
+                //         ...target.params,
+                //         prompt: prompt,
+                //         // imageRatio: params.ratio.type,
+                //         modelConfig: selectModel,
+                //         sampleStrength: params.strength,
+                //         model: selectModel.modelReqKey,
+                //         seed: params.seed ?? target.seed,
+                //         largeImageInfo: {
+                //           width: params.ratio.width,
+                //           height: params.ratio.height,
+                //           resolutionType: params.clarity === "2k" ? "2k" : "1k",
+                //         },
+                //       };
+                //     }
+                //     return target[prop];
+                //   }
+                // });
 
                 if (window.__STOP_GENERATING__) {
                   // 同上，不执行新任务
                   return;
                 }
 
-                // 替换原始对象
-                imageManager._generateImageParamsManager = proxyParamsManager;
-                const generatePromise = imageManager.generateContent(undefined, {isQueue: true});
-                // 恢复原始对象
-                imageManager._generateImageParamsManager = paramsManager;
-                
-                const result = await generatePromise;
-                
-                if (result.code === 0) {
-                  successCount++;
-                } else {
-                  failCount++;
-                  console.error('Generate failed:', result.errMsg);
+                const generatorService = await (window as any).__debugger._containerService.services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-task-feature-loader-service').getInstance();
+                const selectModel = imageGeneratorManager.data._metadata.generateImageModelList.find((model: any) => model.modelReqKey === params.model.value);
+
+                const createTaskResult = await generatorService.createAIGCTextToImageTask({
+                  ...imageGeneratorManager.data.params,
+                  prompt: prompt,
+                  // imageRatio: params.ratio.type,
+                  model: selectModel.modelReqKey,
+                  seed: params.seed ?? undefined,
+                  largeImageInfo: {
+                    width: params.ratio.width,
+                    height: params.ratio.height,
+                    resolutionType: params.clarity === "2k" ? "2k" : "1k",
+                  },
+                  isRegenerate: false,
+                });
+                if (!createTaskResult.ok) {
+                  throw new Error('Generate failed: ' + createTaskResult.errMsg);
                 }
+
+                const submitId = createTaskResult.value.idModel.submitId;
+
+                await new Promise((resolve, reject) => {
+                  generatorService.onAigcDataTaskGenerated((task: any) => {
+                    if (task.idModel.submitId !== submitId) {
+                      return;
+                    }
+
+                    if (taskIdMap.has(task.idModel.submitId)) {
+                      console.log('handleBatchGenerate', 'onAigcDataTaskGenerated task already exists', task, taskIdMap);
+                      return;
+                    }
+
+                    if (task.statusModel.statusCode === 50 && task.statusModel.recordStatus === 1) {
+                      successCount++;
+                      taskIdMap.set(task.idModel.submitId, true);
+                      console.log('handleBatchGenerate', 'onAigcDataTaskGenerated task success', task);
+                      resolve(task);
+                    } else if (task.statusModel.recordStatus === 2) {
+                      failCount++;
+                      taskIdMap.set(task.idModel.submitId, false);
+                      console.log('handleBatchGenerate', 'onAigcDataTaskGenerated task fail', task);
+                      console.error('Generate failed:', task.statusModel.statusCode);
+                      resolve(task);
+                    }
+                  });
+                });
               } catch (error) {
                 failCount++;
-                console.error('Generate single image error:', error);
+                console.error('handleBatchGenerate', 'Generate single image error:', error);
               }
 
               totalProcessed++;
@@ -270,6 +295,57 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
     } catch (error) {
       console.error('停止批量生成失败:', error);
       throw error;
+    }
+  }
+
+  /**
+   * 处理获取模型列表请求
+   * @param tabId 标签页ID
+   * @returns 处理结果
+   */
+  private async handleGetModelList(tabId: number): Promise<GetModelListResponse> {
+    try {
+      // 在页面中执行获取模型列表的函数
+      const results = await chrome.scripting.executeScript({
+        target: { tabId },
+        world: "MAIN",
+        func: function() {
+          // TODO: 这里编写获取模型列表的具体逻辑
+          // 返回模型列表，例如：
+          // return { models: [...] };
+          // @ts-ignore
+          const services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as any;
+          const contentGeneratorFeatureService = services.find((item: { _services: { _entries: { keys: () => { (): any; new(): any; toArray: { (): any[]; new(): any; }; }; }; }; }) => item._services._entries.keys().toArray().find(item => item.toString() === 'content-generator-feature-service'))._services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-feature-service');
+          // const contentGeneratorFeatureService = parent && parent._services.entries.find((_, key) => key.toString() === 'content-generator-feature-service');
+
+          if (!contentGeneratorFeatureService) {
+            console.error('无法获取 contentGeneratorFeatureService');
+            return;
+          }
+
+          const imageGeneratorManager = contentGeneratorFeatureService.imageGeneratorManager;
+          if (!imageGeneratorManager) {
+            console.error('无法获取 imageGeneratorManager');
+            // console.error('无法获取 imageGeneratorManager');
+            return;
+          }
+          const modelList = imageGeneratorManager.data._metadata.generateImageModelList;
+          return { models: modelList.map((model: any) => ({
+            name: model.modelName,
+            value: model.modelReqKey,
+            description: model.modelTip,
+          })) };
+        }
+      });
+
+      if (!results || results.length === 0) {
+        throw new Error('脚本执行失败：没有返回结果');
+      }
+
+      // 返回获取到的模型列表
+      return results[0].result as GetModelListResponse;
+    } catch (error: any) {
+      return { error: error.message || "获取模型列表失败" };
     }
   }
 } 

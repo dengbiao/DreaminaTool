@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./RouteValidator.module.scss";
 
 interface RouteValidatorProps {
-  urlPattern: RegExp;
+  urlPattern: RegExp | RegExp[];
   title?: string;
   description?: string;
   children: React.ReactNode;
@@ -25,7 +25,11 @@ export const RouteValidator: React.FC<RouteValidatorProps> = ({
   useEffect(() => {
     const checkUrl = () => {
       const url = window.location.href;
-      const isValid = urlPattern.test(url);
+
+      // 支持单个正则或多个正则数组
+      const patterns = Array.isArray(urlPattern) ? urlPattern : [urlPattern];
+      const isValid = patterns.some((pattern) => pattern.test(url));
+
       setIsValidPage(isValid);
     };
 

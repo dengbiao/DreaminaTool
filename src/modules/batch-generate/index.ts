@@ -9,7 +9,8 @@ export const batchGenerateModule: ModuleDefinition = {
   name: 'batch-generate',
   messageTypes: [
     MESSAGE_TYPES.BATCH_GENERATE,
-    MESSAGE_TYPES.STOP_BATCH_GENERATE
+    MESSAGE_TYPES.STOP_BATCH_GENERATE,
+    MESSAGE_TYPES.GET_MODEL_LIST
   ],
   handler: new BatchGenerateHandler()
 }; 

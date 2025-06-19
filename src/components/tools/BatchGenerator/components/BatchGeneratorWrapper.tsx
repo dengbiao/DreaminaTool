@@ -11,9 +11,7 @@ export const BatchGeneratorWrapper: React.FC<BatchGeneratorWrapperProps> = ({
 }) => {
   return (
     <RouteValidator
-      urlPattern={
-        /^https:\/\/jimeng\.jianying\.com\/ai-tool\/(video|image)(\/[a-z-]+)*\/generate/
-      }
+      urlPattern={[/^https:\/\/jimeng\.jianying\.com\/ai-tool\/generate/]}
       title="请先进入生成流界面"
       description="批量生成功能需要在即梦生成流界面使用"
       redirectUrl="https://jimeng.jianying.com/ai-tool/image/generate"

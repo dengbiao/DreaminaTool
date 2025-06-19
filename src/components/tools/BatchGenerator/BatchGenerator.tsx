@@ -47,40 +47,6 @@ const GENERATION_TABS = [
   },
 ];
 
-// 模型配置
-const MODEL_CONFIGS: ModelConfig[] = [
-  {
-    value: "high_aes_general_v30l:general_v3.0_18b",
-    name: "图片 3.0",
-    description: "影视质感，文字更准，直出2k高清图",
-  },
-  {
-    value: "high_aes_general_v21_L:general_v2.1_L",
-    name: "图片 2.1",
-    description: "稳定的结构和更强的影视质感，支持生成中、英文文字",
-  },
-  {
-    value: "model_generate_beta:v1",
-    name: "图片 实验室",
-    description: "创新的试验场，艺术风格更突出，仅在公司内网环境下可见",
-  },
-  {
-    value: "high_aes_general_v20_L:general_v2.0_L",
-    name: "图片 2.0 Pro",
-    description: "大幅提升了多样性和真实的照片质感，开启创新与设计的视觉梦境",
-  },
-  {
-    value: "high_aes_general_v20:general_v2.0",
-    name: "图片 2.0",
-    description: "更精准的描述词响应和多样的风格组合，模型极具想象力！",
-  },
-  {
-    value: "text2img_xl_sft",
-    name: "图片 XL Pro",
-    description: "增强英文生成能力和参考图可控能力，使用引号强化文字效果",
-  },
-];
-
 // 图片比例配置 (标清 1K - 非3.0模型)
 const RATIO_CONFIGS_1K: RatioConfig[] = [
   {
@@ -172,9 +138,33 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<ModelConfig>(
-    MODEL_CONFIGS[0]
-  );
+  // 动态模型列表
+  const [modelConfigs, setModelConfigs] = useState<ModelConfig[]>([]);
+  const [loadingModels, setLoadingModels] = useState(true);
+  const [selectedModel, setSelectedModel] = useState<ModelConfig | null>(null);
+
+  useEffect(() => {
+    // 发送 GET_MODEL_LIST 消息
+    chrome.runtime.sendMessage(
+      {
+        type: "GET_MODEL_LIST",
+      },
+      (response) => {
+        if (
+          response &&
+          Array.isArray(response.models) &&
+          response.models.length > 0
+        ) {
+          setModelConfigs(response.models);
+          setSelectedModel(response.models[0]);
+        } else {
+          setModelConfigs([]);
+          setSelectedModel(null);
+        }
+        setLoadingModels(false);
+      }
+    );
+  }, []);
 
   // 记住图片3.0模型的清晰度选择
   const [model3Clarity, setModel3Clarity] = useState<string>(() => {
@@ -183,7 +173,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
   });
 
   // 当前使用的清晰度
-  const is3Point0Model = selectedModel.name.includes("图片 3.0");
+  const is3Point0Model = selectedModel?.name.includes("图片 3.0");
   const currentClarity = is3Point0Model ? model3Clarity : "1k";
 
   // 根据当前模型和清晰度选择合适的比例配置
@@ -375,6 +365,13 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
     );
   }, [paramsCollapsed]);
 
+  if (loadingModels) {
+    return <div>模型列表加载中...</div>;
+  }
+  if (!selectedModel) {
+    return <div>未获取到可用模型，请稍后重试。</div>;
+  }
+
   return (
     <div className={styles.batchGenerator}>
       <TabSelector
@@ -444,7 +441,7 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
 
         <ParamsPanel
           mode={mode}
-          modelConfigs={MODEL_CONFIGS}
+          modelConfigs={modelConfigs}
           ratioConfigs={ratioConfigs}
           onModelChange={handleModelChange}
           onRatioChange={handleRatioChange}
