@@ -216,7 +216,7 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
           </div>
         )}
 
-        <div className={styles.controlGroup}>
+        {/* <div className={styles.controlGroup}>
           <label>Seed值</label>
           <input
             type="number"
@@ -227,7 +227,7 @@ export const ParamsPanel: React.FC<ParamsPanelProps> = ({
             onChange={(e) => handleSeedChange(e.target.value)}
             className={styles.settingInput}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
