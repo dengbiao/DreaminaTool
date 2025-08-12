@@ -144,27 +144,30 @@ export const BatchGenerator: React.FC<BatchGeneratorProps> = ({
   const [selectedModel, setSelectedModel] = useState<ModelConfig | null>(null);
 
   useEffect(() => {
-    // 发送 GET_MODEL_LIST 消息
-    chrome.runtime.sendMessage(
-      {
-        type: "GET_MODEL_LIST",
-      },
-      (response) => {
-        if (
-          response &&
-          Array.isArray(response.models) &&
-          response.models.length > 0
-        ) {
-          setModelConfigs(response.models);
-          setSelectedModel(response.models[0]);
-        } else {
-          setModelConfigs([]);
-          setSelectedModel(null);
+    // 如果 selectedModel 为空，则获取模型列表
+    if (!selectedModel) {
+      setLoadingModels(true);
+      chrome.runtime.sendMessage(
+        {
+          type: "GET_MODEL_LIST",
+        },
+        (response) => {
+          if (
+            response &&
+            Array.isArray(response.models) &&
+            response.models.length > 0
+          ) {
+            setModelConfigs(response.models);
+            setSelectedModel(response.models[0]);
+          } else {
+            setModelConfigs([]);
+            setSelectedModel(null);
+          }
+          setLoadingModels(false);
         }
-        setLoadingModels(false);
-      }
-    );
-  }, []);
+      );
+    }
+  }, [selectedModel]);
 
   // 记住图片3.0模型的清晰度选择
   const [model3Clarity, setModel3Clarity] = useState<string>(() => {

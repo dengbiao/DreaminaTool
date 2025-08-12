@@ -70,7 +70,10 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
           try {
             // 获取 imageManager 实例
             // @ts-ignore
-            const services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as any;
+            let services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as Array<any>;
+            if (services.length === 0) {
+              services = Array.from(Array.from((window as any).__debugger._containerService._childs)[0]._childs as any) as Array<any>;
+            }
             const contentGeneratorFeatureService = services.find((item: { _services: { _entries: { keys: () => { (): any; new(): any; toArray: { (): any[]; new(): any; }; }; }; }; }) => item._services._entries.keys().toArray().find(item => item.toString() === 'content-generator-feature-service'))._services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-feature-service');
             // const contentGeneratorFeatureService = parent && parent._services.entries.find((_, key) => key.toString() === 'content-generator-feature-service');
 
@@ -192,12 +195,12 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
                       return;
                     }
 
-                    if (task.statusModel.statusCode === 50 && task.statusModel.recordStatus === 1) {
+                    if (task.statusModel.statusCode === 50 && task.statusModel.recordStatus === 2) {
                       successCount++;
                       taskIdMap.set(task.idModel.submitId, true);
                       console.log('handleBatchGenerate', 'onAigcDataTaskGenerated task success', task);
                       resolve(task);
-                    } else if (task.statusModel.recordStatus === 2) {
+                    } else if (task.statusModel.recordStatus === 3) {
                       failCount++;
                       taskIdMap.set(task.idModel.submitId, false);
                       console.log('handleBatchGenerate', 'onAigcDataTaskGenerated task fail', task);
@@ -314,7 +317,10 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
           // 返回模型列表，例如：
           // return { models: [...] };
           // @ts-ignore
-          const services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as any;
+          let services = Array.from(Array.from((window as any).__debugger._containerService._childs)[1]._childs as any) as any;
+          if (services.length === 0) {
+            services = Array.from(Array.from((window as any).__debugger._containerService._childs)[0]._childs as any) as any;
+          }
           const contentGeneratorFeatureService = services.find((item: { _services: { _entries: { keys: () => { (): any; new(): any; toArray: { (): any[]; new(): any; }; }; }; }; }) => item._services._entries.keys().toArray().find(item => item.toString() === 'content-generator-feature-service'))._services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-feature-service');
           // const contentGeneratorFeatureService = parent && parent._services.entries.find((_, key) => key.toString() === 'content-generator-feature-service');
 
