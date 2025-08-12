@@ -159,7 +159,7 @@ export class BatchGenerateHandler implements MessageHandler<BatchGenerateMessage
                   return;
                 }
 
-                const generatorService = await (window as any).__debugger._containerService.services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-task-feature-loader-service').getInstance();
+                const generatorService = await (window as any).__debugger._containerService.services.entries.find((_: any, key: { toString: () => string; }) => key.toString() === 'content-generator-task-feature-container-service').getInstance();
                 const selectModel = imageGeneratorManager.data._metadata.generateImageModelList.find((model: any) => model.modelReqKey === params.model.value);
 
                 const createTaskResult = await generatorService.createAIGCTextToImageTask({
